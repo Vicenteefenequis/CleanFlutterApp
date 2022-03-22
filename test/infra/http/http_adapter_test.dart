@@ -49,12 +49,6 @@ void main() {
       verify(client.post(any, headers: anyNamed("headers")));
     });
 
-    test('Should return data if post returns 200', () async {
-      final response = await sut.request(url: url, method: 'post');
-
-      expect(response, {"any_key": "any_value"});
-    });
-
     test('Should return null if post returns 200 with no data', () async {
       mockResponse(200, body: '');
 
@@ -81,6 +75,22 @@ void main() {
       final future = sut.request(url: url, method: 'post');
 
       expect(future, throwsA(HttpError.badRequest));
+    });
+
+    test('Should return BadRequestError if post returns 400', () async {
+      mockResponse(400, body: '');
+
+      final future = sut.request(url: url, method: 'post');
+
+      expect(future, throwsA(HttpError.badRequest));
+    });
+
+    test('Should return ServerError if post returns 500', () async {
+      mockResponse(500);
+
+      final future = sut.request(url: url, method: 'post');
+
+      expect(future, throwsA(HttpError.serverError));
     });
   });
 }
