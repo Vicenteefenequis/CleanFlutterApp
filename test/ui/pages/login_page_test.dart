@@ -13,15 +13,20 @@ void main() {
   LoginPresenter presenter;
   StreamController<String> emailErrorController;
   StreamController<String> passwordErrorControler;
+  StreamController<bool> isFormValidController;
 
   Future<void> loadPage(WidgetTester tester) async {
     presenter = LoginPresenterSpy();
     emailErrorController = StreamController<String>();
     passwordErrorControler = StreamController<String>();
+    isFormValidController = StreamController<bool>();
     when(presenter.emailErrorStream)
         .thenAnswer((_) => emailErrorController.stream);
     when(presenter.passwordErrorStream)
         .thenAnswer((_) => passwordErrorControler.stream);
+
+    when(presenter.isFormValidStream)
+        .thenAnswer((_) => isFormValidController.stream);
     final loginPage = MaterialApp(home: LoginPage(presenter));
     await tester.pumpWidget(loginPage);
   }
@@ -29,6 +34,7 @@ void main() {
   tearDown(() {
     emailErrorController.close();
     passwordErrorControler.close();
+    isFormValidController.close();
   });
 
   testWidgets('Should load with correct initial state',
@@ -158,5 +164,16 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Should enable button if form is valid',
+      (WidgetTester tester) async {
+    await loadPage(tester);
+
+    isFormValidController.add(true);
+    await tester.pump();
+
+    final button = tester.widget<RaisedButton>(find.byType(RaisedButton));
+    expect(button.onPressed, isNotNull);
   });
 }
