@@ -70,6 +70,7 @@ void main() {
 
     final button = tester.widget<RaisedButton>(find.byType(RaisedButton));
     expect(button.onPressed, null);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
   testWidgets('Should call validate with correct values',
@@ -210,5 +211,16 @@ void main() {
     await tester.tap(find.byType(RaisedButton));
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
+  testWidgets('Should hide loading', (WidgetTester tester) async {
+    await loadPage(tester);
+
+    isLoadController.add(true);
+    await tester.pump();
+    isLoadController.add(false);
+    await tester.pump();
+
+    expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 }
