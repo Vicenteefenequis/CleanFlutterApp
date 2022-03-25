@@ -34,11 +34,28 @@ void main() {
     verify(validation.validate(field: 'email', value: email)).called(1);
   });
 
-  test('Should emit emial error if validation fails', () {
+  test('Should emit email error if validation fails', () {
     mockValidation(value: 'error');
 
     sut.emailErrorStream.listen(
       expectAsync1((error) => expect(error, 'error')),
+    );
+
+    sut.isFormValidStream.listen(
+      expectAsync1((isValid) => expect(isValid, false)),
+    );
+
+    sut.validateEmail(email);
+    sut.validateEmail(email);
+  });
+
+  test('Should emit null if validation success', () {
+    sut.emailErrorStream.listen(
+      expectAsync1((error) => expect(error, null)),
+    );
+
+    sut.isFormValidStream.listen(
+      expectAsync1((isValid) => expect(isValid, false)),
     );
 
     sut.validateEmail(email);
