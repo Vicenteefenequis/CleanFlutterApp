@@ -1,3 +1,4 @@
+import 'package:ForDev/domain/usecases/authentication.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -7,9 +8,12 @@ import 'package:ForDev/presentation/presenters/presenters.dart';
 
 class ValidationSpy extends Mock implements Validation {}
 
+class AuthenticationSpy extends Mock implements Authentication {}
+
 void main() {
   StreamLoginPresenter sut;
   ValidationSpy validation;
+  AuthenticationSpy authentication;
   String email;
   String password;
 
@@ -25,8 +29,10 @@ void main() {
   }
 
   setUp(() {
+    authentication = AuthenticationSpy();
     validation = ValidationSpy();
-    sut = StreamLoginPresenter(validation: validation);
+    sut = StreamLoginPresenter(
+        validation: validation, authentication: authentication);
     email = faker.internet.email();
     password = faker.internet.password();
     mockValidation();
@@ -111,5 +117,15 @@ void main() {
 
     sut.validateEmail(email);
     sut.validatePassword(password);
+  });
+
+  test('Should call Authentication with correct values', () async {
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+    await sut.auth();
+
+    verify(authentication
+            .auth(AuthenticationParams(email: email, secret: password)))
+        .called(1);
   });
 }
