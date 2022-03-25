@@ -1,12 +1,12 @@
-import 'package:ForDev/domain/entities/account_entity.dart';
-import 'package:ForDev/domain/helpers/domain_error.dart';
-import 'package:ForDev/domain/usecases/authentication.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:ForDev/presentation/protocols/protocols.dart';
 import 'package:ForDev/presentation/presenters/presenters.dart';
+import 'package:ForDev/domain/usecases/usecases.dart';
+import 'package:ForDev/domain/helpers/helpers.dart';
+import 'package:ForDev/domain/entities/entities.dart';
 
 class ValidationSpy extends Mock implements Validation {}
 
@@ -177,5 +177,11 @@ void main() {
     );
 
     await sut.auth();
+  });
+
+  test('Should not emit after dispose', () async {
+    expectLater(sut.emailErrorStream, neverEmits(null));
+    sut.dispose();
+    sut.validateEmail(email);
   });
 }
